@@ -1,0 +1,13 @@
+---
+- name: Install OpenSSH server
+  ansible.builtin.apt:
+    name: openssh-server
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Ensure ssh service is enabled and running
+  ansible.builtin.systemd:
+    name: ssh
+    enabled: true
+    state: started

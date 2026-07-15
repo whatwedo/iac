@@ -1,0 +1,49 @@
+name: Molecule
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: ansible
+
+jobs:
+  molecule:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Add a role's scenario name here when you create molecule/<role>/.
+        scenario:
+          - sshd
+    name: molecule (${{ matrix.scenario }})
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Molecule and dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install \
+            ansible-core \
+            molecule \
+            "molecule-plugins[podman]" \
+            pytest-testinfra
+          ansible-galaxy collection install containers.podman
+
+      - name: Run molecule ${{ matrix.scenario }} scenario
+        run: molecule test -s ${{ matrix.scenario }}
+        env:
+          PY_COLORS: "1"
+          ANSIBLE_FORCE_COLOR: "1"
