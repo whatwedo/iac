@@ -16,16 +16,6 @@ defaults:
 jobs:
   molecule:
     runs-on: ubuntu-latest
-    # Run every step inside the iac-shell image so CI uses the exact same
-    # Ansible/Molecule/collection versions as local development (`wwd`).
-    container:
-      image: ghcr.io/whatwedo/iac-shell:latest
-      # Molecule's podman driver starts test containers *inside* this job
-      # container (podman-in-podman), so we need --privileged (nested
-      # containers + systemd). Running as root avoids workspace ownership
-      # clashes: hosted runners own the checkout as UID 1001, the image's
-      # default user is UID 1000.
-      options: --privileged --user root
     strategy:
       fail-fast: false
       matrix:
@@ -33,21 +23,27 @@ jobs:
         scenario:
           - sshd
     name: molecule (${{ matrix.scenario }})
-    env:
-      # The image sets CONTAINER_HOST to the local rootless podman socket used
-      # by `wwd`; that socket does not exist in CI, so clear it and let podman
-      # run natively inside this container.
-      CONTAINER_HOST: ""
-      PY_COLORS: "1"
-      ANSIBLE_FORCE_COLOR: "1"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Trust the checkout directory for git
-        run: git config --global --add safe.directory '*'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-      # No tool installation step: ansible, molecule, molecule-plugins[podman]
-      # and the containers.podman collection are all baked into iac-shell.
+      - name: Install Molecule and dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install \
+            ansible-core \
+            molecule \
+            "molecule-plugins[podman]" \
+            pytest-testinfra
+          ansible-galaxy collection install containers.podman
+
       - name: Run molecule ${{ matrix.scenario }} scenario
         run: molecule test -s ${{ matrix.scenario }}
+        env:
+          PY_COLORS: "1"
+          ANSIBLE_FORCE_COLOR: "1"
