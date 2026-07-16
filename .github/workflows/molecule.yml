@@ -40,15 +40,6 @@ jobs:
       CONTAINER_HOST: ""
       PY_COLORS: "1"
       ANSIBLE_FORCE_COLOR: "1"
-      # GitHub Actions forces HOME=/github/home for container jobs, but the
-      # iac-shell image's user home is /home/wwd-admin. Molecule's podman driver
-      # deletes instances with an async shell task followed by an async_status
-      # poll; each resolves the default async dir (~/.ansible_async) against a
-      # different HOME, so the poll looks in the wrong place ("could not find
-      # job") and `destroy` fails with return code 2. Pinning an absolute path
-      # removes the ~ expansion so launch and poll always agree. (Locally under
-      # `wwd` HOME is consistent, which is why molecule passes there.)
-      ANSIBLE_ASYNC_DIR: "/tmp/.ansible_async"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
