@@ -1,14 +1,12 @@
 """Testinfra checks for the sshd role."""
 
-
 def test_openssh_server_installed(host):
     assert host.package("openssh-server").is_installed
 
 
-def test_ssh_service_running_and_enabled(host):
-    ssh = host.service("ssh")
-    assert ssh.is_running
-    assert ssh.is_enabled
+def test_ssh_enabled_and_listening(host):
+    assert host.service("ssh").is_enabled
+    assert host.socket("tcp://0.0.0.0:22").is_listening
 
 
 def test_sshd_config_hardened(host):
