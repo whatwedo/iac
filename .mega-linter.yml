@@ -1,0 +1,31 @@
+# Configuration file for MegaLinter
+#
+# See all available variables at https://megalinter.io/latest/config-file/ and in
+# linters documentation.
+#
+# This repo runs the MegaLinter "terraform" flavor (see
+# .github/workflows/mega-linter.yml), which bundles the linters relevant to an
+# Ansible + OpenTofu codebase: ANSIBLE (ansible-lint), TERRAFORM (tofu/terraform
+# fmt, tflint, terrascan, terragrunt), YAML, MARKDOWN, BASH, DOCKERFILE and the
+# repository-wide secret/security scanners (gitleaks, trivy, checkov, …).
+
+# all, none, or list of linter keys. Formatting/auto-fixable issues are corrected
+# and proposed back as a pull request (see APPLY_FIXES_MODE in the workflow).
+APPLY_FIXES: all
+
+DISABLE:
+  - SPELL # Disable checks of spelling mistakes
+  # - COPYPASTE # Uncomment to disable checks of excessive copy-pastes
+
+SHOW_ELAPSED_TIME: true
+
+# Uncomment if you want MegaLinter to detect errors but not block CI to pass
+# DISABLE_ERRORS: true
+
+# The Molecule testinfra tests (ansible/molecule/**/tests/*.py) use pytest-style
+# fixtures that Bandit flags with false positives; exclude that tree from Bandit.
+PYTHON_BANDIT_FILTER_REGEX_EXCLUDE: (^|/)molecule/
+
+# config is created during the megalinter ci run and kingfisher complains about
+# credentials found in there
+REPOSITORY_KINGFISHER_ARGUMENTS: "--exclude .git/"

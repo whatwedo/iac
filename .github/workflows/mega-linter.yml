@@ -1,0 +1,84 @@
+---
+# MegaLinter GitHub Action configuration file.
+# More info at https://megalinter.io
+#
+# Uses the "terraform" flavor, which covers this repo's Ansible + OpenTofu
+# building blocks (ansible-lint, tofu/terraform, yaml, markdown, bash, dockerfile
+# and repo-wide secret scanning). Linter behaviour is tuned in .mega-linter.yml.
+name: MegaLinter
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch: {}
+
+# Least-privilege by default; the job below grants only what it needs.
+permissions: {}
+
+env:
+  # Apply linter auto-fixes and open them as a pull request rather than pushing
+  # straight to the branch.
+  APPLY_FIXES: all
+  APPLY_FIXES_EVENT: pull_request
+  APPLY_FIXES_MODE: pull_request
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  megalinter:
+    name: MegaLinter
+    runs-on: ubuntu-latest
+    permissions:
+      # Needed to push the auto-fix branch, comment on PRs and open the fixes PR.
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+          # Full history so MegaLinter can lint only what changed on PRs.
+          fetch-depth: 0
+
+      - name: MegaLinter
+        id: ml
+        uses: oxsecurity/megalinter/flavors/terraform@v8
+        env:
+          # Lint the whole codebase on push to main; only changed files on PRs.
+          VALIDATE_ALL_CODEBASE: >-
+            ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Archive MegaLinter reports
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MegaLinter reports
+          include-hidden-files: "true"
+          path: |
+            megalinter-reports
+            mega-linter.log
+
+      - name: Create pull request with applied fixes
+        id: cpr
+        if: >
+          steps.ml.outputs.has_updated_sources == 1 &&
+          (env.APPLY_FIXES_EVENT == 'all' || env.APPLY_FIXES_EVENT == github.event_name) &&
+          env.APPLY_FIXES_MODE == 'pull_request' &&
+          (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) &&
+          !contains(github.event.head_commit.message, 'skip fix')
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+          commit-message: "[MegaLinter] Apply linters automatic fixes"
+          title: "[MegaLinter] Apply linters automatic fixes"
+          labels: bot
+
+      - name: Output pull request URL
+        if: steps.cpr.outputs.pull-request-number
+        run: |
+          echo "Pull request #${{ steps.cpr.outputs.pull-request-number }}: ${{ steps.cpr.outputs.pull-request-url }}"
