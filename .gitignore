@@ -1,0 +1,4 @@
+# MegaLinter run artifacts (generated locally via mega-linter-runner / in CI)
+megalinter-reports/
+mega-linter.log
+__pycache__
