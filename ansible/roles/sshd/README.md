@@ -4,9 +4,9 @@ Installs the OpenSSH server and applies a baseline hardening of the SSH daemon.
 
 ## What it does
 
-| Task file | Tag | Description |
-| --- | --- | --- |
-| `1_base.yml` | `base` | Installs `openssh-server` and ensures the `ssh` service is enabled and running. |
+| Task file         | Tag         | Description                                                                                 |
+|-------------------|-------------|---------------------------------------------------------------------------------------------|
+| `1_base.yml`      | `base`      | Installs `openssh-server` and ensures the `ssh` service is enabled and running.             |
 | `2_hardening.yml` | `hardening` | Disables password authentication, disables root login, and locks the root account password. |
 
 Changes to the SSH daemon config notify the `Restart sshd` handler, so the
