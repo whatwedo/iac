@@ -14,7 +14,7 @@ here.
 
 ## Layout
 
-```
+```text
 ansible/
   ansible.cfg            # roles_path, default inventory, interpreter   (add when needed)
   requirements.yml       # external collections / roles pulled from Galaxy
