@@ -33,3 +33,7 @@ PYTHON_BANDIT_FILTER_REGEX_EXCLUDE: (^|/)molecule/
 # config is created during the megalinter ci run and kingfisher complains about
 # credentials found in there
 REPOSITORY_KINGFISHER_ARGUMENTS: "--exclude .git/"
+
+# Run zizmor's offline audits only. Its online audits query the GitHub API, which
+# fails in CI (401) since MegaLinter doesn't forward GITHUB_TOKEN to the linter.
+ACTION_ZIZMOR_ARGUMENTS: "--offline"
