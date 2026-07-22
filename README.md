@@ -16,11 +16,11 @@ See [docs/](docs/README.md) for the full documentation index.
 
 ## Open Source ❤️
 
-<p align="center">
+<p align="left">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/whatwedo-logo-white.svg">
-    <source media="(prefers-color-scheme: light)" srcset="assets/whatwedo-logo-black.svg">
-    <img alt="whatwedo" src="assets/whatwedo-logo-black.svg" width="280">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/whatwedo-logo-white.svg">
+    <source media="(prefers-color-scheme: light)" srcset="docs/assets/whatwedo-logo-black.svg">
+    <img alt="whatwedo" src="docs/assets/whatwedo-logo-black.svg" width="280">
   </picture>
 </p>
 
