@@ -43,6 +43,9 @@ jobs:
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
           # Full history so MegaLinter can lint only what changed on PRs.
           fetch-depth: 0
+          # The auto-fix PR is pushed by create-pull-request with its own token,
+          # so the checkout token doesn't need to persist in git config.
+          persist-credentials: false
 
       - name: MegaLinter
         id: ml
@@ -80,5 +83,8 @@ jobs:
 
       - name: Output pull request URL
         if: steps.cpr.outputs.pull-request-number
+        env:
+          PR_NUMBER: ${{ steps.cpr.outputs.pull-request-number }}
+          PR_URL: ${{ steps.cpr.outputs.pull-request-url }}
         run: |
-          echo "Pull request #${{ steps.cpr.outputs.pull-request-number }}: ${{ steps.cpr.outputs.pull-request-url }}"
+          echo "Pull request #${PR_NUMBER}: ${PR_URL}"
