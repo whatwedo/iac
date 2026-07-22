@@ -18,11 +18,7 @@ DISABLE:
   # - COPYPASTE # Uncomment to disable checks of excessive copy-pastes
 
 DISABLE_LINTERS:
-  # grype (v0.94.0, pinned by MegaLinter v8.8.0) fails to hydrate its
-  # vulnerability DB in CI ("UNIQUE constraint failed: operating_systems" ->
-  # "database does not exist"), a known bug in grype's DB-v6 migration path in
-  # older releases. It also adds no signal here: it scans a source-only IaC repo
-  # (no images/lockfiles) and trivy already covers vuln/IaC/secret scanning.
+  # Redundant on this source-only IaC repo; trivy already covers vuln scanning.
   - REPOSITORY_GRYPE
 
 SHOW_ELAPSED_TIME: true

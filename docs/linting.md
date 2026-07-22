@@ -24,22 +24,22 @@ lives in [`.github/workflows/mega-linter.yml`](../.github/workflows/mega-linter.
 
 The table below lists the checks relevant to this Ansible + OpenTofu codebase.
 
-| Check | Linter(s) | What it checks |
-| --- | --- | --- |
-| Ansible | ansible-lint | Ansible role/playbook errors & best practices |
+| Check                | Linter(s)                                    | What it checks                                           |
+|----------------------|----------------------------------------------|----------------------------------------------------------|
+| Ansible              | ansible-lint                                 | Ansible role/playbook errors & best practices            |
 | Terraform / OpenTofu | terraform fmt, tflint, terrascan, terragrunt | Tofu/Terraform formatting, validity & security misconfig |
-| YAML | yamllint, prettier | YAML syntax, style & formatting |
-| Markdown | markdownlint | Markdown style & formatting |
-| Bash | shellcheck, shfmt | Shell script bugs & formatting |
-| Dockerfile | hadolint | Dockerfile best practices |
-| Python | bandit | Python security issues |
-| Secrets | gitleaks, kingfisher | Leaked credentials/secrets in the repo |
-| Security / IaC | trivy, checkov | Vulnerabilities & IaC misconfigurations |
-| Copy-paste | jscpd | Excessive duplicated code |
+| YAML                 | yamllint, prettier                           | YAML syntax, style & formatting                          |
+| Markdown             | markdownlint                                 | Markdown style & formatting                              |
+| Bash                 | shellcheck, shfmt                            | Shell script bugs & formatting                           |
+| Dockerfile           | hadolint                                     | Dockerfile best practices                                |
+| Python               | bandit                                       | Python security issues                                   |
+| Secrets              | gitleaks, kingfisher                         | Leaked credentials/secrets in the repo                   |
+| Security / IaC       | trivy, checkov                               | Vulnerabilities & IaC misconfigurations                  |
+| Copy-paste           | jscpd                                        | Excessive duplicated code                                |
 
 Disabled checks:
 
-| Check | Linter | Why disabled |
-| --- | --- | --- |
-| Spelling | cspell | Too noisy for this repo (`DISABLE: SPELL`) |
-| Vulnerability scan | grype | DB fails to hydrate in CI; trivy already covers this (`DISABLE_LINTERS: REPOSITORY_GRYPE`) |
+| Check              | Linter | Why disabled                                                                                            |
+|--------------------|--------|---------------------------------------------------------------------------------------------------------|
+| Spelling           | cspell | Too noisy for this repo (`DISABLE: SPELL`)                                                              |
+| Vulnerability scan | grype  | Redundant on this source-only IaC repo; trivy already covers this (`DISABLE_LINTERS: REPOSITORY_GRYPE`) |

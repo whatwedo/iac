@@ -7,8 +7,8 @@ See [AGENTS.md](AGENTS.md) for the conventions all roles follow.
 
 ## Roles
 
-| Role | Description |
-| --- | --- |
+| Role                         | Description                                                    |
+|------------------------------|----------------------------------------------------------------|
 | [sshd](roles/sshd/README.md) | Installs the OpenSSH server and applies baseline SSH hardening |
 
 ## Development environment — iac-shell
