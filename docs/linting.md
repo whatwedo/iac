@@ -43,8 +43,3 @@ Disabled checks:
 | --- | --- | --- |
 | Spelling | cspell | Too noisy for this repo (`DISABLE: SPELL`) |
 | Vulnerability scan | grype | DB fails to hydrate in CI; trivy already covers this (`DISABLE_LINTERS: REPOSITORY_GRYPE`) |
-
-## Molecule
-
-[Molecule](https://ansible.readthedocs.io/projects/molecule/) exercises the
-Ansible roles. See [`ansible/README.md`](../ansible/README.md) for how to run it.
