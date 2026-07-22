@@ -11,9 +11,13 @@ provisioner:
   name: ansible
   env:
     ANSIBLE_ROLES_PATH: "../../roles"
+  # Reuse the shared `test` inventory instead of inlining vars here, so the role
+  # is exercised against the same groups/host_vars a real run would use. The
+  # platform name above matches its host, so that host's vars/groups apply.
   inventory:
-    group_vars:
-      all:
-        ansible_user: test-admin
+    links:
+      hosts: ../../inventories/test/hosts
+      group_vars: ../../inventories/test/group_vars/
+      host_vars: ../../inventories/test/host_vars/
 verifier:
   name: testinfra

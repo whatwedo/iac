@@ -1,0 +1,17 @@
+# Test inventory
+#
+# The `test` environment Molecule provisions and converges roles against.
+#
+# Hosts here carry NO connection vars (ansible_host / ansible_user / ...):
+# Molecule owns the connection to the ephemeral container it creates, named to
+# match the host below (see molecule/<role>/molecule.yml). This file exists so a
+# role's group_vars/ and host_vars/ apply during `molecule test`, exactly as
+# they would against a real host. To target a real box, add `ansible_host=<ip>`.
+
+[test]
+iac-test-debian
+
+# Hosts grouped by the role(s) they receive. Add a group per role as the tree
+# grows and put role-scoped values in group_vars/<group>/.
+[sshd]
+iac-test-debian

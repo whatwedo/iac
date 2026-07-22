@@ -1,0 +1,4 @@
+# Environment inventories that must never be committed. The `test` inventory is
+# intentionally tracked (Molecule reuses it); real environments hold live host
+# data and secrets, so they stay local / vaulted.
+inventories/production/

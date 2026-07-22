@@ -1,0 +1,9 @@
+---
+# Variables applied to every host in the `test` environment.
+#
+# Molecule links this directory into its ephemeral inventory, so these values
+# apply during `molecule test` too, the point of reusing the test inventory.
+
+# The test image (ghcr.io/whatwedo/iac-test-debian) ships a preconfigured
+# `test-admin` user with passwordless sudo; connect and become through it.
+ansible_user: test-admin

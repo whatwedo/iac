@@ -1,0 +1,6 @@
+---
+# Host-specific variables for the test host.
+#
+# The name matches the Molecule platform in molecule/<role>/molecule.yml, so the
+# ephemeral container inherits any values set here during `molecule test`.
+# Empty for now — add host-scoped overrides as needed.

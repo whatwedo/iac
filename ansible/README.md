@@ -52,6 +52,12 @@ Scenarios run against the
 with a preconfigured `test-admin` user — so tests can assert real service state
 (e.g. that `sshd` is actually running).
 
+Each scenario reuses the shared [`test` inventory](inventories/test) rather than
+inlining values in `molecule.yml`: `provisioner.inventory.links` pulls in its
+`hosts`, `group_vars/` and `host_vars/`, so a role is exercised against the same
+groups and variables a real run would use. The Molecule platform is named to
+match a host in that inventory so its host/group vars apply.
+
 Run a scenario (from inside `wwd`):
 
 ```bash
