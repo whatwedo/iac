@@ -87,10 +87,15 @@ role take effect immediately, with no rebuild or reinstall.
 The symlink is strictly a *read* path. `ansible-galaxy collection install`
 writes to the first entry of `collections_path` and deletes the destination
 before unpacking, so `ansible.cfg` leads with the disposable, gitignored
-`.galaxy/collections` and lists `../collections` only after it. Anything that
-installs collections — including ansible-lint, which sets up the
-collection-under-test on its own — lands in `.galaxy/` and leaves the source
-tree alone. If a stale copy there ever shadows your edits, delete it:
+`.galaxy/collections` and lists `../collections` only after it. Collections you
+install while working here land in `.galaxy/` and leave the source tree alone.
+
+Note that `-p/--collections-path` does not override this: whenever `ansible.cfg`
+is loaded from the current directory, its `collections_path` takes precedence.
+Installing to a specific location means running from a directory with no
+`ansible.cfg` and pinning `ANSIBLE_COLLECTIONS_PATH`.
+
+If a stale copy in `.galaxy/` ever shadows your edits, delete it:
 
 ```bash
 rm -rf ansible/.galaxy/collections

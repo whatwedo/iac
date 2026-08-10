@@ -35,21 +35,36 @@ jobs:
 
       # Catches an invalid galaxy.yml and, via build_ignore, an artifact that
       # accidentally ships the dev-only inventory or Molecule scenarios.
+      # Built outside the source tree so the tarball is never an input to a
+      # later step that walks this directory.
       - name: Build the collection
-        run: ansible-galaxy collection build --force
+        run: ansible-galaxy collection build --force --output-path "$RUNNER_TEMP/dist"
 
+      # Runs from /tmp on purpose: from `ansible/`, this repo's ansible.cfg is
+      # picked up and its collections_path wins over -p, so the artifact lands
+      # in the working tree instead of the destination asked for here. Pinning
+      # ANSIBLE_COLLECTIONS_PATH as well makes the destination unambiguous.
       - name: Install the built artifact
+        working-directory: /tmp
+        env:
+          ANSIBLE_COLLECTIONS_PATH: /tmp/collections
         run: |
           ansible-galaxy collection install \
-            whatwedo-iac-*.tar.gz -p /tmp/collections
+            "$RUNNER_TEMP"/dist/whatwedo-iac-*.tar.gz \
+            --collections-path /tmp/collections
+          echo "--- what landed where ---"
+          find /tmp/collections -mindepth 1 -maxdepth 4
 
       - name: Verify the installed artifact is complete
+        working-directory: /tmp
+        env:
+          ANSIBLE_COLLECTIONS_PATH: /tmp/collections
         run: |
           root=/tmp/collections/ansible_collections/whatwedo/iac
           echo "--- installed tree ---"
           ls -la "$root"
           echo "--- collections found (informational) ---"
-          ANSIBLE_COLLECTIONS_PATH=/tmp/collections ansible-galaxy collection list || true
+          ansible-galaxy collection list || true
           test -f "$root/MANIFEST.json"
           test -d "$root/roles/sshd"
 

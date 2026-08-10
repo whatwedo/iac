@@ -80,8 +80,12 @@ something installs into.** `ansible-galaxy collection install` writes to the
 first configured path and `shutil.rmtree`s the destination before unpacking:
 against the symlink that crashes with *"Cannot call rmtree on a symbolic
 link"*, and against a real path inside this tree it would delete the source.
-ansible-lint installs the collection-under-test this way, so it happens without
-anyone typing the command.
+
+Passing `-p/--collections-path` is **not** enough to avoid this: when
+`ansible.cfg` is picked up from the current directory, its `collections_path`
+wins and the artifact lands in the working tree regardless of the flag. To
+install somewhere specific, run from a directory with no `ansible.cfg` and pin
+`ANSIBLE_COLLECTIONS_PATH` — see `.github/workflows/collection.yml`.
 
 `ansible.cfg` therefore leads with `.galaxy/collections` — disposable and
 gitignored — and only then `../collections`. Molecule's `ANSIBLE_COLLECTIONS_PATH`
