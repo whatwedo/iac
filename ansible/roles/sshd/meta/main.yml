@@ -1,0 +1,19 @@
+---
+galaxy_info:
+  author: whatwedo GmbH
+  description: Installs the OpenSSH server and applies baseline SSH hardening.
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Debian
+      versions:
+        - bookworm
+        - trixie
+  galaxy_tags:
+    - ssh
+    - sshd
+    - openssh
+    - hardening
+    - security
+
+dependencies: []
