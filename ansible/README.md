@@ -18,24 +18,37 @@ All the tooling (Ansible, Molecule, linters/formatters like `yamllint` and
 a containerized shell — so you don't install any of it on your host. The only
 requirement is [podman](https://podman.io/).
 
-Load the `wwd` helper (add the line to your `~/.bashrc` to make it permanent):
+Clone the repository and source its `source.sh` to get the `iac` helper:
 
 ```bash
-source <(curl -s https://raw.githubusercontent.com/whatwedo/iac-shell/refs/heads/main/source.sh)
+git clone https://github.com/whatwedo/iac-shell.git ~/git/whatwedo/iac-shell.git
+source ~/git/whatwedo/iac-shell.git/source.sh
+```
+
+Add the line to your `~/.bashrc` to make it permanent:
+
+```bash
+echo 'source ~/git/whatwedo/iac-shell.git/source.sh' >> ~/.bashrc
+```
+
+Update it later with:
+
+```bash
+git -C ~/git/whatwedo/iac-shell.git pull
 ```
 
 Then drop into the shell from the repo root:
 
 ```bash
-wwd
+iac
 ```
 
-`wwd` mounts your current directory at `/workspace` and wires through the podman
+`iac` mounts your current directory at `/workspace` and wires through the podman
 socket, so Molecule can start test containers from inside the shell. Pass
 `--pull` to force-refresh the image:
 
 ```bash
-wwd --pull
+iac --pull
 ```
 
 Run the Ansible and Molecule commands below from inside this shell.
@@ -58,7 +71,7 @@ inlining values in `molecule.yml`: `provisioner.inventory.links` pulls in its
 groups and variables a real run would use. The Molecule platform is named to
 match a host in that inventory so its host/group vars apply.
 
-Run a scenario (from inside `wwd`):
+Run a scenario (from inside `iac`):
 
 ```bash
 cd ansible
