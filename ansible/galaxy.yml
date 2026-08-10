@@ -7,7 +7,7 @@ version: 0.1.0
 
 readme: README.md
 authors:
-  - whatwedo GmbH <welcome@whatwedo.ch>
+  - whatwedo GmbH <welove@whatwedo.ch>
 
 description: >-
   Generic Ansible building blocks — roles and thin playbooks — for provisioning
