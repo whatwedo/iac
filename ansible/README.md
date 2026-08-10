@@ -8,9 +8,9 @@ See [AGENTS.md](AGENTS.md) for the conventions all roles follow.
 
 ## Contents
 
-| Role                                       | FQCN                | Description                                                    |
-|--------------------------------------------|---------------------|----------------------------------------------------------------|
-| [sshd](roles/sshd/README.md)               | `whatwedo.iac.sshd` | Installs the OpenSSH server and applies baseline SSH hardening |
+| Role                         | FQCN                | Description                                                    |
+|------------------------------|---------------------|----------------------------------------------------------------|
+| [sshd](roles/sshd/README.md) | `whatwedo.iac.sshd` | Installs the OpenSSH server and applies baseline SSH hardening |
 
 ## Installing
 
