@@ -46,6 +46,18 @@ jobs:
           # The auto-fix PR is pushed by create-pull-request with its own token,
           # so the checkout token doesn't need to persist in git config.
           persist-credentials: false
+          # On pull_request events actions/checkout defaults to the ephemeral
+          # refs/pull/N/merge commit, leaving a detached HEAD. create-pull-request
+          # cannot derive a base from that and fails with "the 'base' input must
+          # be supplied", so check out the PR's real head branch instead.
+          #
+          # Only for same-repo PRs: a fork's branch does not exist here, and the
+          # step below refuses to open a fixes PR for forks anyway. The empty
+          # fallback means "use the default", which is correct for fork PRs
+          # (merge commit) and for push/workflow_dispatch (the pushed branch).
+          ref: >-
+            ${{ github.event.pull_request.head.repo.full_name == github.repository
+            && github.event.pull_request.head.ref || '' }}
 
       - name: MegaLinter
         id: ml
