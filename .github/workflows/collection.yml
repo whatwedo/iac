@@ -43,11 +43,33 @@ jobs:
           ansible-galaxy collection install \
             whatwedo-iac-*.tar.gz -p /tmp/collections
 
-      - name: Verify the installed collection resolves
+      - name: Verify the installed artifact is complete
         run: |
-          ANSIBLE_COLLECTIONS_PATH=/tmp/collections \
-            ansible-galaxy collection list whatwedo.iac
-          test -d /tmp/collections/ansible_collections/whatwedo/iac/roles/sshd
+          root=/tmp/collections/ansible_collections/whatwedo/iac
+          echo "--- installed tree ---"
+          ls -la "$root"
+          echo "--- collections found (informational) ---"
+          ANSIBLE_COLLECTIONS_PATH=/tmp/collections ansible-galaxy collection list || true
+          test -f "$root/MANIFEST.json"
+          test -d "$root/roles/sshd"
+
+      # Resolves the role by FQCN from the installed artifact, exactly as a
+      # consumer does. Runs from /tmp so the repo's own ansible.cfg and the
+      # working-tree collections symlink cannot mask a broken artifact.
+      - name: Verify the role resolves by FQCN
+        working-directory: /tmp
+        env:
+          ANSIBLE_COLLECTIONS_PATH: /tmp/collections
+        run: |
+          cat > /tmp/resolve-check.yml <<'PLAY'
+          ---
+          - name: Resolve the collection role by FQCN
+            hosts: localhost
+            gather_facts: false
+            roles:
+              - whatwedo.iac.sshd
+          PLAY
+          ansible-playbook --syntax-check -i localhost, /tmp/resolve-check.yml
 
       - name: Verify dev-only files stayed out of the artifact
         run: |
