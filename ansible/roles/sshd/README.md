@@ -2,6 +2,9 @@
 
 Installs the OpenSSH server and applies a baseline hardening of the SSH daemon.
 
+Part of the [`whatwedo.iac`](../../README.md) collection; referenced as
+`whatwedo.iac.sshd`.
+
 ## What it does
 
 | Task file         | Tag         | Description                                                                                 |
@@ -32,7 +35,7 @@ None. The role is intentionally opinionated; all behaviour is fixed.
   hosts: all
   become: true
   roles:
-    - sshd
+    - whatwedo.iac.sshd
 ```
 
 Run a single slice with tags, e.g. only the hardening step:

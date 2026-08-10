@@ -1,3 +1,8 @@
+# Built collection artifacts (`ansible-galaxy collection build`).
+whatwedo-iac-*.tar.gz
+# Roles/collections pulled from Galaxy (see roles_path in ansible.cfg).
+.galaxy/
+
 # Environment inventories that must never be committed. The `test` inventory is
 # intentionally tracked (Molecule reuses it); real environments hold live host
 # data and secrets, so they stay local / vaulted.

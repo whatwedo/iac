@@ -1,0 +1,47 @@
+---
+# Collection metadata. Build with `ansible-galaxy collection build` from this
+# directory; the tarball contains only what `build_ignore` below leaves in.
+namespace: whatwedo
+name: iac
+version: 0.1.0
+
+readme: README.md
+authors:
+  - whatwedo GmbH <welcome@whatwedo.ch>
+
+description: >-
+  Generic Ansible building blocks — roles and thin playbooks — for provisioning
+  and configuring Debian/Linux infrastructure.
+
+# TODO(before merge): the repo has no LICENSE file yet. Pick one, add it at the
+# repo root, and either keep the SPDX id below or switch to `license_file`.
+license:
+  - MIT
+
+tags:
+  - infrastructure
+  - linux
+  - debian
+  - system
+  - security
+
+repository: https://github.com/whatwedo/iac
+documentation: https://github.com/whatwedo/iac/blob/main/ansible/README.md
+homepage: https://whatwedo.ch
+issues: https://github.com/whatwedo/iac/issues
+
+dependencies: {}
+
+# Development-only files that must not end up in the built artifact. Molecule
+# scenarios and the test inventory are how we develop the collection, not part
+# of what consumers install.
+build_ignore:
+  - ansible.cfg
+  - inventories
+  - molecule
+  - AGENTS.md
+  - .claude
+  - .claudainer
+  - .gitignore
+  - __pycache__
+  - "*.tar.gz"

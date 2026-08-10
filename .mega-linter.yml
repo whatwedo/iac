@@ -23,6 +23,11 @@ DISABLE_LINTERS:
 
 SHOW_ELAPSED_TIME: true
 
+# `collections/ansible_collections/whatwedo/iac` is a symlink to `ansible/` that
+# makes the collection resolvable by FQCN during development (see
+# ansible/README.md). Exclude it so linters don't report every finding twice.
+FILTER_REGEX_EXCLUDE: (^|/)collections/ansible_collections/
+
 # Uncomment if you want MegaLinter to detect errors but not block CI to pass
 # DISABLE_ERRORS: true
 
