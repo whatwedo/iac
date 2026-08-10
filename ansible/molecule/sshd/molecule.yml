@@ -11,12 +11,17 @@ provisioner:
   name: ansible
   env:
     # Resolve `whatwedo.iac.*` straight from the working tree, so edits to a
-    # role take effect without rebuilding/reinstalling the collection. The path
-    # is relative to this scenario directory and points at the checked-in
-    # symlink <repo>/collections/ansible_collections/whatwedo/iac -> ansible/.
-    # The default locations stay on the list: Molecule's own create/destroy
-    # playbooks need `containers.podman`, which is installed there.
-    ANSIBLE_COLLECTIONS_PATH: "../../../collections:~/.ansible/collections:/usr/share/ansible/collections"
+    # role take effect without rebuilding/reinstalling the collection. Paths are
+    # relative to this scenario directory:
+    #
+    #   ../../../collections     the checked-in symlink -> ansible/
+    #   ../../.galaxy/collections  where ansible-galaxy installs externals
+    #                              (containers.podman, needed by Molecule's own
+    #                              create/destroy playbooks)
+    #
+    # Molecule only ever reads through these, so leading with the symlink is
+    # safe here — unlike in ansible.cfg, which is also an install target.
+    ANSIBLE_COLLECTIONS_PATH: "../../../collections:../../.galaxy/collections:~/.ansible/collections:/usr/share/ansible/collections"
   # Reuse the shared `test` inventory instead of inlining vars here, so the role
   # is exercised against the same groups/host_vars a real run would use. The
   # platform name above matches its host, so that host's vars/groups apply.

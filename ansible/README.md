@@ -84,6 +84,18 @@ collections/ansible_collections/whatwedo/iac -> ../../../ansible
 is what makes `whatwedo.iac.sshd` resolve against your working tree — edits to a
 role take effect immediately, with no rebuild or reinstall.
 
+The symlink is strictly a *read* path. `ansible-galaxy collection install`
+writes to the first entry of `collections_path` and deletes the destination
+before unpacking, so `ansible.cfg` leads with the disposable, gitignored
+`.galaxy/collections` and lists `../collections` only after it. Anything that
+installs collections — including ansible-lint, which sets up the
+collection-under-test on its own — lands in `.galaxy/` and leaves the source
+tree alone. If a stale copy there ever shadows your edits, delete it:
+
+```bash
+rm -rf ansible/.galaxy/collections
+```
+
 ## Development environment — iac-shell
 
 All the tooling (Ansible, Molecule, linters/formatters like `yamllint` and

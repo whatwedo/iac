@@ -75,6 +75,18 @@ Do not delete or re-target it, and keep the default collection paths
 (`~/.ansible/collections`, `/usr/share/ansible/collections`) on the list —
 Molecule's own create/destroy playbooks need `containers.podman` from there.
 
+**The symlink must never be the first entry in a collections path that
+something installs into.** `ansible-galaxy collection install` writes to the
+first configured path and `shutil.rmtree`s the destination before unpacking:
+against the symlink that crashes with *"Cannot call rmtree on a symbolic
+link"*, and against a real path inside this tree it would delete the source.
+ansible-lint installs the collection-under-test this way, so it happens without
+anyone typing the command.
+
+`ansible.cfg` therefore leads with `.galaxy/collections` — disposable and
+gitignored — and only then `../collections`. Molecule's `ANSIBLE_COLLECTIONS_PATH`
+may lead with the symlink because it only ever reads through it.
+
 ## Core convention — ordered task files + matching tags
 
 This is the defining pattern of the repo; **every role follows it.**

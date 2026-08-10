@@ -73,7 +73,7 @@ jobs:
 
       - name: Verify dev-only files stayed out of the artifact
         run: |
-          for path in inventories molecule ansible.cfg; do
+          for path in inventories molecule ansible.cfg .galaxy; do
             if [ -e "/tmp/collections/ansible_collections/whatwedo/iac/$path" ]; then
               echo "::error::$path was shipped in the collection artifact"
               exit 1

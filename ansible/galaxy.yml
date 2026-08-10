@@ -39,6 +39,9 @@ build_ignore:
   - ansible.cfg
   - inventories
   - molecule
+  # Galaxy-installed roles/collections, including a copy of this collection
+  # that ansible-lint installs while setting up the collection-under-test.
+  - .galaxy
   - AGENTS.md
   - .claude
   - .claudainer
