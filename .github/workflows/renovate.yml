@@ -1,0 +1,70 @@
+---
+# Self-hosted Renovate. Keeps the digest-pinned `uses:` refs in the other
+# workflows current (tag -> SHA resolution by hand is what this replaces), plus
+# the Ansible collections in ansible/requirements.yml and the Python toolchain in
+# ansible/requirements-dev.txt.
+#
+# Update policy (grouping, automerge) lives in .github/renovate.json, which
+# Renovate reads straight from the repo. See docs/dependencies.md.
+name: Renovate
+
+on:
+  schedule:
+    # Mondays 04:00 UTC. This cron is the *only* schedule: .github/renovate.json
+    # deliberately sets no `schedule`, so a manual run below always does work
+    # instead of silently no-op'ing outside a configured window.
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+    inputs:
+      dryRun:
+        description: "Run without creating branches or PRs"
+        type: boolean
+        default: false
+      logLevel:
+        description: "Renovate log level"
+        type: choice
+        options: [info, debug]
+        default: info
+  push:
+    branches: [main]
+    # Pick up config changes immediately rather than waiting for the cron.
+    paths:
+      - .github/renovate.json
+      - .github/workflows/renovate.yml
+
+# Renovate authenticates with RENOVATE_TOKEN, so this job needs no permissions on
+# the automatic GITHUB_TOKEN at all.
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  renovate:
+    name: Renovate
+    runs-on: ubuntu-latest
+    steps:
+      # No actions/checkout step: Renovate clones the repo itself and reads
+      # .github/renovate.json from that clone.
+      - name: Renovate
+        uses: renovatebot/github-action@e09d604f8f803bb527bd8321ed5be06c460b8682 # v46.2.2
+        with:
+          # Fine-grained PAT scoped to this repo. Needs contents, pull-requests
+          # and issues (dependency dashboard) read/write, plus *workflows*
+          # read/write - without that last one Renovate cannot edit the files
+          # under .github/workflows/, which is the main reason it is here.
+          # The automatic GITHUB_TOKEN is unusable: it cannot write workflow
+          # files, and PRs it opens do not trigger MegaLinter or Molecule.
+          token: ${{ secrets.RENOVATE_TOKEN }}
+        env:
+          RENOVATE_PLATFORM: github
+          RENOVATE_AUTODISCOVER: "false"
+          RENOVATE_REPOSITORIES: ${{ github.repository }}
+          # Config is committed, so skip the onboarding PR and fail loudly if it
+          # ever goes missing.
+          RENOVATE_ONBOARDING: "false"
+          RENOVATE_REQUIRE_CONFIG: required
+          # "null" is how a self-hosted env var unsets dryRun.
+          RENOVATE_DRY_RUN: ${{ inputs.dryRun == true && 'full' || 'null' }}
+          LOG_LEVEL: ${{ inputs.logLevel || 'info' }}

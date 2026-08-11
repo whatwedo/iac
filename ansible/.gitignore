@@ -2,3 +2,6 @@
 # intentionally tracked (Molecule reuses it); real environments hold live host
 # data and secrets, so they stay local / vaulted.
 inventories/production/
+
+# Collections/roles installed from requirements.yml (see ansible.cfg roles_path).
+.galaxy/

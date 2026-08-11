@@ -1,0 +1,47 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    "helpers:pinGitHubActionDigests"
+  ],
+  "timezone": "Europe/Zurich",
+  "labels": ["dependencies"],
+  "semanticCommits": "enabled",
+  "semanticCommitType": "chore",
+  "semanticCommitScope": "deps",
+  "prConcurrentLimit": 5,
+  "rebaseWhen": "conflicted",
+  "packageRules": [
+    {
+      "description": "Non-major action bumps: one grouped PR, merged by CI.",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor", "patch", "digest", "pin"],
+      "groupName": "github-actions (non-major)",
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true
+    },
+    {
+      "description": "Action majors change inputs/outputs - always review.",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["major"],
+      "automerge": false
+    },
+    {
+      "description": "Molecule/testinfra toolchain, non-major.",
+      "matchManagers": ["pip_requirements", "ansible-galaxy"],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
+      "groupName": "ansible test toolchain",
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true
+    },
+    {
+      "description": "ansible-core/molecule majors can move the controller Python floor.",
+      "matchManagers": ["pip_requirements", "ansible-galaxy"],
+      "matchUpdateTypes": ["major"],
+      "automerge": false
+    }
+  ]
+}

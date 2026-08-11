@@ -1,0 +1,17 @@
+# Python toolchain for the Molecule/testinfra runs (.github/workflows/molecule.yml).
+#
+# Pinned exactly so an upstream release cannot break CI without a commit here.
+# Renovate's pip_requirements manager proposes the bumps; it only tracks pinned
+# entries, so keep the `==` (see docs/dependencies.md).
+#
+# ansible-core 2.21 already requires Python >= 3.12, so CI sits exactly on the
+# floor: the next ansible-core bump may force a Python bump too, which means
+# editing `python-version` in the workflow and `interpreter_python` in
+# ansible.cfg together. That is why those majors are not automerged.
+#
+# molecule-plugins[podman] carries no extra dependencies - the podman driver
+# talks to the containers.podman collection from requirements.yml.
+ansible-core==2.21.3
+molecule==26.6.0
+molecule-plugins[podman]==26.7.15
+pytest-testinfra==10.2.2
