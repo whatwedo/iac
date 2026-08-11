@@ -71,6 +71,30 @@ is present in the installed artifact. New roles declare
 
 Bump `version:` in `galaxy.yml` (semver) for any change consumers can observe.
 
+## The supported ansible-core version
+
+`requires_ansible` in [meta/runtime.yml](meta/runtime.yml) is the single source
+of truth, currently **`>=2.19.0`**. Three other places must state the same
+series, and drift between them is silent:
+
+| File                               | Declaration                              |
+|------------------------------------|------------------------------------------|
+| `meta/runtime.yml`                 | `requires_ansible: ">=2.19.0"`           |
+| `roles/<role>/meta/main.yml`       | `min_ansible_version: "2.19"`            |
+| `.github/workflows/molecule.yml`   | `pip install "ansible-core>=2.19,<2.20"` |
+| `.github/workflows/collection.yml` | `pip install "ansible-core>=2.19,<2.20"` |
+
+CI pins the *floor* rather than installing the newest release, so a green run
+proves the version we advertise actually works, and a new upstream release can
+never turn a passing branch red on its own. Raising the floor is therefore a
+deliberate, consumer-observable change: edit all four, and bump `galaxy.yml`.
+
+Two versions deliberately stay out of this: the ansible-core bundled in the
+MegaLinter image that runs `ansible-lint`, and the one in the
+[iac-shell](https://github.com/whatwedo/iac-shell) dev container. Both are
+upstream-managed, so treat local `ansible --version` output as informational —
+CI's pin is the contract.
+
 ## Local resolution — the collections symlink
 
 Collection tooling only resolves content from a path ending in

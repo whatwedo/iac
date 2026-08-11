@@ -28,10 +28,13 @@ jobs:
         with:
           python-version: "3.12"
 
+      # Pinned to the series declared in ansible/meta/runtime.yml, so the
+      # artifact is built and resolved on the oldest ansible-core we claim to
+      # support rather than on whatever is newest on PyPI that day.
       - name: Install ansible-core
         run: |
           python -m pip install --upgrade pip
-          pip install ansible-core
+          pip install "ansible-core>=2.19,<2.20"
 
       # Catches an invalid galaxy.yml and, via build_ignore, an artifact that
       # accidentally ships the dev-only inventory or Molecule scenarios.
