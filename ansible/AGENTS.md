@@ -7,10 +7,17 @@ here.)
 ## What this is
 
 Reusable Ansible **building blocks** — roles and thin playbooks — for
-provisioning and configuring our Ubuntu/Linux infrastructure, packaged as the
+provisioning and configuring our Debian/Linux infrastructure, packaged as the
 **`whatwedo.iac` collection**. Ansible owns *host and platform* configuration;
 application workloads are expected to run on top (e.g. a Kubernetes / GitOps
 layer) rather than being deployed directly from here.
+
+The target platform is **Debian**. Each role declares the versions it supports
+in `roles/<role>/meta/main.yml` (`galaxy_info.platforms`) — currently
+`bookworm` and `trixie` — and Molecule exercises roles on Debian 13
+(`trixie`). Nothing validates that claim automatically, so keep the declared
+platforms, the role's README and this file in step, and only list a platform
+we are prepared to support.
 
 This directory *is* the collection root — `galaxy.yml` lives here. Consumers
 install it from git (see [README.md](README.md)) and reference content by FQCN,

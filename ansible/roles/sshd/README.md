@@ -17,7 +17,9 @@ service is restarted only when its configuration actually changes.
 
 ## Requirements
 
-- Debian/Ubuntu target (uses `ansible.builtin.apt` and the `ssh` systemd unit).
+- Debian target — `bookworm` or `trixie` (see [meta/main.yml](meta/main.yml)).
+  The role uses `ansible.builtin.apt` and the `ssh` systemd unit, so other
+  Debian-family distributions may work, but are not declared or tested.
 - Privilege escalation (`become: true`).
 
 > ⚠️ This role turns off SSH password authentication and root login. Make sure a
