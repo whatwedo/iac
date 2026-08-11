@@ -5,6 +5,7 @@
     regexp: "^PasswordAuthentication"
     line: "PasswordAuthentication no"
     state: present
+  notify: Restart sshd
 
 - name: Ensure PermitRootLogin is set to no
   ansible.builtin.lineinfile:
