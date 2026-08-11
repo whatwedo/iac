@@ -1,15 +1,106 @@
-# Ansible
+# whatwedo.iac — Ansible Collection
 
 Reusable Ansible **building blocks** — roles and thin playbooks — for
-provisioning and configuring our Debian/Linux infrastructure.
+provisioning and configuring our Debian/Linux infrastructure, packaged as the
+`whatwedo.iac` collection.
 
 See [AGENTS.md](AGENTS.md) for the conventions all roles follow.
 
-## Roles
+## Contents
 
-| Role                         | Description                                                    |
-|------------------------------|----------------------------------------------------------------|
-| [sshd](roles/sshd/README.md) | Installs the OpenSSH server and applies baseline SSH hardening |
+| Role                         | FQCN                | Description                                                    |
+|------------------------------|---------------------|----------------------------------------------------------------|
+| [sshd](roles/sshd/README.md) | `whatwedo.iac.sshd` | Installs the OpenSSH server and applies baseline SSH hardening |
+
+## Installing
+
+The collection is not published to Ansible Galaxy (yet), so consumers install it
+straight from git. Add it to your `requirements.yml` — the `#/ansible` fragment
+points at the collection inside this monorepo, and the trailing ref pins the
+version:
+
+```yaml
+---
+collections:
+  - name: git+https://github.com/whatwedo/iac.git#/ansible
+    type: git
+    version: v0.1.0
+```
+
+```bash
+ansible-galaxy collection install -r requirements.yml
+```
+
+Always pin a tag rather than tracking `main`, so an upgrade is a reviewable
+one-line change.
+
+## Using a role
+
+Reference roles by their fully-qualified collection name. Playbooks stay thin —
+they bind a host group to an ordered list of roles and little else:
+
+```yaml
+---
+- name: Configure hosts
+  hosts: all
+  become: true
+  roles:
+    - whatwedo.iac.sshd
+```
+
+Every role splits its work into ordered, tagged task files, so you can run a
+single slice:
+
+```bash
+ansible-playbook -i inventories/production site.yml --tags hardening
+```
+
+Note that `ansible.cfg`, inventories and secrets **do not** travel with the
+collection — those stay in the consuming repo.
+
+## Layout
+
+```text
+ansible/                     # <- the collection root (galaxy.yml lives here)
+  galaxy.yml                 # collection metadata + build_ignore
+  LICENSE                    # AGPL-3.0-or-later, a copy of the repo-root LICENSE
+  meta/runtime.yml           # minimum supported ansible-core
+  roles/<role>/              # the unit of work; almost all logic lives here
+  playbooks/                 # optional shipped playbooks, callable as whatwedo.iac.<name>
+
+  # Development-only — excluded from the built artifact via build_ignore:
+  ansible.cfg
+  inventories/test/          # shared test inventory, reused by Molecule
+  molecule/<role>/           # one scenario per role
+```
+
+Because collection tooling resolves content from a path ending in
+`ansible_collections/<namespace>/<name>/`, the repo carries a checked-in symlink:
+
+```text
+collections/ansible_collections/whatwedo/iac -> ../../../ansible
+```
+
+`ansible.cfg` and the Molecule scenarios point `collections_path` at it, which
+is what makes `whatwedo.iac.sshd` resolve against your working tree — edits to a
+role take effect immediately, with no rebuild or reinstall.
+
+The symlink is strictly a *read* path. `ansible-galaxy collection install`
+writes to the first entry of `collections_path` and deletes the destination
+before unpacking, so `ansible.cfg` leads with the disposable, gitignored
+`.galaxy/collections` and lists `../collections` only after it. Collections you
+install while working here land in `.galaxy/` and leave the source tree alone.
+
+Note that `-p/--collections-path` does not override this: whenever `ansible.cfg`
+is loaded from the current directory, its `collections_path` takes precedence.
+Installing to a specific location means running from a directory with no
+`ansible.cfg` and pinning `ANSIBLE_COLLECTIONS_PATH`.
+
+If a stale copy in `.galaxy/` ever shadows your edits, delete it:
+
+```bash
+rm -rf ansible/.galaxy/collections
+```
 
 ## Development environment — iac-shell
 
@@ -73,7 +164,32 @@ match a host in that inventory so its host/group vars apply.
 
 Run a scenario (from inside `iac`):
 
+Scenarios converge the role through its **FQCN**, so a passing test also proves
+the collection resolves the way it will for a consumer.
+
+Run a scenario (from inside `iac`):
+
 ```bash
 cd ansible
 molecule test -s sshd
 ```
+
+## Releasing
+
+1. Bump `version:` in [galaxy.yml](galaxy.yml) following semver.
+2. Merge to `main`.
+3. Tag the release: `git tag v<version> && git push origin v<version>`.
+4. Bump the pinned `version:` in the consuming repo's `requirements.yml`.
+
+`.github/workflows/collection.yml` builds and installs the artifact on every PR,
+so a broken `galaxy.yml` or an artifact that accidentally ships the dev-only
+inventory fails CI before it reaches a tag.
+
+## License
+
+Copyright (C) 2026 whatwedo GmbH — **AGPL-3.0-or-later**.
+
+The full text is in [LICENSE](LICENSE) next to `galaxy.yml`, so it travels with
+the built collection. It is a copy of the [repo-root LICENSE](../LICENSE) rather
+than a symlink: `ansible-galaxy` copies file symlinks verbatim when installing
+from a directory or git ref, which would leave consumers with a dangling link.

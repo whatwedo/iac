@@ -2,6 +2,9 @@
 
 Installs the OpenSSH server and applies a baseline hardening of the SSH daemon.
 
+Part of the [`whatwedo.iac`](../../README.md) collection; referenced as
+`whatwedo.iac.sshd`.
+
 ## What it does
 
 | Task file         | Tag         | Description                                                                                 |
@@ -14,7 +17,9 @@ service is restarted only when its configuration actually changes.
 
 ## Requirements
 
-- Debian/Ubuntu target (uses `ansible.builtin.apt` and the `ssh` systemd unit).
+- Debian target — `bookworm` or `trixie` (see [meta/main.yml](meta/main.yml)).
+  The role uses `ansible.builtin.apt` and the `ssh` systemd unit, so other
+  Debian-family distributions may work, but are not declared or tested.
 - Privilege escalation (`become: true`).
 
 > ⚠️ This role turns off SSH password authentication and root login. Make sure a
@@ -32,7 +37,7 @@ None. The role is intentionally opinionated; all behaviour is fixed.
   hosts: all
   become: true
   roles:
-    - sshd
+    - whatwedo.iac.sshd
 ```
 
 Run a single slice with tags, e.g. only the hardening step:

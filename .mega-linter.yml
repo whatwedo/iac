@@ -23,6 +23,15 @@ DISABLE_LINTERS:
 
 SHOW_ELAPSED_TIME: true
 
+# Two trees that mirror sources we already lint directly:
+#   collections/ansible_collections/  a symlink to `ansible/`, so the collection
+#                                     resolves by FQCN (see ansible/README.md)
+#   ansible/.galaxy/                  where ansible-galaxy installs collections
+#                                     and roles, including this one when
+#                                     ansible-lint sets up the collection
+# Excluding both keeps every finding from being reported twice.
+FILTER_REGEX_EXCLUDE: ((^|/)collections/ansible_collections/|(^|/)\.galaxy/)
+
 # Uncomment if you want MegaLinter to detect errors but not block CI to pass
 # DISABLE_ERRORS: true
 

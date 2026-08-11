@@ -34,11 +34,14 @@ jobs:
         with:
           python-version: "3.12"
 
+      # ansible-core is pinned to the series declared in ansible/meta/runtime.yml
+      # so scenarios run against the minimum we claim to support. Bump both
+      # together — see the comment in that file.
       - name: Install Molecule and dependencies
         run: |
           python -m pip install --upgrade pip
           pip install \
-            ansible-core \
+            "ansible-core>=2.19,<2.20" \
             molecule \
             "molecule-plugins[podman]" \
             pytest-testinfra

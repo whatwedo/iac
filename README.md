@@ -6,13 +6,28 @@ Generic Ansible + OpenTofu building blocks for our infrastructure.
 
 ## Ansible
 
-Reusable roles and thin playbooks for provisioning and configuring hosts.
-See [ansible/README.md](ansible/README.md) for the roles, the development
-environment ([iac-shell](https://github.com/whatwedo/iac-shell)), and testing.
+Reusable roles and thin playbooks for provisioning and configuring hosts,
+packaged as the **`whatwedo.iac`** Ansible collection. See
+[ansible/README.md](ansible/README.md) for how to install and consume it, the
+roles it ships, the development environment
+([iac-shell](https://github.com/whatwedo/iac-shell)), and testing.
 
 ## Documentation
 
 See [docs/](docs/README.md) for the full documentation index.
+
+## License
+
+Copyright (C) 2026 whatwedo GmbH
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the **GNU Affero General Public License** as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version — see [LICENSE](LICENSE) for the full text.
+
+It is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.
 
 ## Open Source ❤️
 

@@ -1,6 +1,8 @@
 ---
+# The role is referenced by its fully-qualified collection name, exactly as a
+# consumer would after `ansible-galaxy collection install whatwedo.iac`.
 - name: Converge
   hosts: all
   become: true
   roles:
-    - sshd
+    - whatwedo.iac.sshd

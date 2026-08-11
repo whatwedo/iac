@@ -1,0 +1,7 @@
+---
+# Minimum ansible-core the collection is tested against — and CI pins exactly
+# this series (see .github/workflows/{molecule,collection}.yml), so the floor
+# declared here is the floor that is actually exercised. Raising it means
+# updating those two workflows and `min_ansible_version` in every role's
+# meta/main.yml in the same change.
+requires_ansible: ">=2.19.0"
