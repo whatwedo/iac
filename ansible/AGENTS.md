@@ -21,6 +21,7 @@ e.g. `whatwedo.iac.sshd`.
 ```text
 ansible/                   # <- collection root
   galaxy.yml               # metadata, version, build_ignore
+  LICENSE                  # AGPL-3.0-or-later, copy of the repo-root LICENSE
   meta/runtime.yml         # requires_ansible
   requirements.yml         # external collections / roles pulled from Galaxy
   playbooks/               # thin playbooks: bind a host group -> roles
@@ -29,7 +30,7 @@ ansible/                   # <- collection root
       tasks/               # ordered task files (see convention below)
       defaults/main.yml    # tunable defaults, documented
       handlers/main.yml
-      meta/main.yml        # galaxy_info: platforms, license
+      meta/main.yml        # galaxy_info: platforms, license (AGPL-3.0-or-later)
       templates/  files/
 
   # Development-only. Listed in build_ignore, so it never ships:
@@ -60,6 +61,13 @@ own. Two consequences worth remembering:
 When adding a dev-only file or directory to this tree, add it to `build_ignore`
 in `galaxy.yml`. CI (`.github/workflows/collection.yml`) fails if the built
 artifact contains `inventories/`, `molecule/` or `ansible.cfg`.
+
+**The license text ships.** The collection is AGPL-3.0-or-later, which requires
+the license to be conveyed with the work, so `LICENSE` sits at the collection
+root (a copy of the repo-root file, not a symlink — `ansible-galaxy` copies file
+symlinks verbatim when installing from a directory or git ref) and CI asserts it
+is present in the installed artifact. New roles declare
+`license: AGPL-3.0-or-later` in `meta/main.yml`.
 
 Bump `version:` in `galaxy.yml` (semver) for any change consumers can observe.
 

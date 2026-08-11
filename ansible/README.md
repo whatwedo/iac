@@ -63,6 +63,7 @@ collection — those stay in the consuming repo.
 ```text
 ansible/                     # <- the collection root (galaxy.yml lives here)
   galaxy.yml                 # collection metadata + build_ignore
+  LICENSE                    # AGPL-3.0-or-later, a copy of the repo-root LICENSE
   meta/runtime.yml           # minimum supported ansible-core
   roles/<role>/              # the unit of work; almost all logic lives here
   playbooks/                 # optional shipped playbooks, callable as whatwedo.iac.<name>
@@ -183,3 +184,12 @@ molecule test -s sshd
 `.github/workflows/collection.yml` builds and installs the artifact on every PR,
 so a broken `galaxy.yml` or an artifact that accidentally ships the dev-only
 inventory fails CI before it reaches a tag.
+
+## License
+
+Copyright (C) 2026 whatwedo GmbH — **AGPL-3.0-or-later**.
+
+The full text is in [LICENSE](LICENSE) next to `galaxy.yml`, so it travels with
+the built collection. It is a copy of the [repo-root LICENSE](../LICENSE) rather
+than a symlink: `ansible-galaxy` copies file symlinks verbatim when installing
+from a directory or git ref, which would leave consumers with a dangling link.

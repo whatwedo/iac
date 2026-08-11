@@ -67,6 +67,8 @@ jobs:
           ansible-galaxy collection list || true
           test -f "$root/MANIFEST.json"
           test -d "$root/roles/sshd"
+          # AGPL-3.0-or-later requires the license text to travel with the work.
+          test -f "$root/LICENSE"
 
       # Resolves the role by FQCN from the installed artifact, exactly as a
       # consumer does. Runs from /tmp so the repo's own ansible.cfg and the

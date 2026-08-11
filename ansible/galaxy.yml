@@ -13,10 +13,11 @@ description: >-
   Generic Ansible building blocks — roles and thin playbooks — for provisioning
   and configuring Debian/Linux infrastructure.
 
-# TODO(before merge): the repo has no LICENSE file yet. Pick one, add it at the
-# repo root, and either keep the SPDX id below or switch to `license_file`.
+# SPDX identifier; the full text ships in this directory's LICENSE. That is a
+# copy of the repo-root LICENSE on purpose: the collection root is `ansible/`, so
+# a symlink would install dangling for consumers who install from git.
 license:
-  - MIT
+  - AGPL-3.0-or-later
 
 tags:
   - infrastructure
