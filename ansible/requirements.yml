@@ -1,0 +1,13 @@
+---
+# External Ansible content pulled from Galaxy.
+#
+# Versions are pinned so a CI run is reproducible; Renovate's ansible-galaxy
+# manager proposes the bumps (see docs/dependencies.md).
+#
+# Install with `ansible-galaxy collection install -r requirements.yml` from this
+# directory. Do not pass `-p`: the install wipes its destination first, and both
+# CI and iac-shell rely on the default ~/.ansible/collections path.
+collections:
+  # Required by the Molecule podman driver to manage the test containers.
+  - name: containers.podman
+    version: "1.20.2"

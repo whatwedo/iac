@@ -7,6 +7,9 @@ GitHub Actions run on every push to `main` and on pull requests:
   Auto-fixable issues are proposed back as a pull request. Tune it via
   [`.mega-linter.yml`](../.mega-linter.yml).
 - **Molecule** exercises the Ansible roles (see [`ansible/`](../ansible/README.md)).
+- **Renovate** opens pull requests for outdated actions and Ansible/Python
+  dependencies. Its PRs are gated by the two checks above — see
+  [dependencies.md](dependencies.md).
 
 Run MegaLinter locally with [`mega-linter-runner`](https://megalinter.io/latest/mega-linter-runner/)
 (needs Docker):
