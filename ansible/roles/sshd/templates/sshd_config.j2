@@ -1,0 +1,152 @@
+{{ ansible_managed | comment }}
+#
+# Hardened OpenSSH server configuration, rendered from the sshd role.
+# Target: OpenSSH 9.9 or newer.
+#
+# This file is fully managed by Ansible - do not edit by hand, override the
+# role's variables instead. It intentionally does NOT include
+# /etc/ssh/sshd_config.d/*.conf: sshd uses first-obtained-value, so anything
+# in that directory would silently win over the settings below.
+
+# --- Listener ----------------------------------------------------------
+
+Port {{ sshd_port }}
+AddressFamily {{ sshd_address_family }}
+{% for address in sshd_listen_addresses %}
+ListenAddress {{ address }}
+{% endfor %}
+
+# --- Host keys -----------------------------------------------------------
+
+{% for key in sshd_host_keys %}
+HostKey {{ key }}
+{% endfor %}
+HostKeyAlgorithms {{ sshd_host_key_algorithms }}
+
+# --- Key exchange: post-quantum hybrid --------------------------------
+
+{% if sshd_kex_strict_pq_only %}
+KexAlgorithms {{ sshd_kex_algorithms_pq_only }}
+{% else %}
+KexAlgorithms {{ sshd_kex_algorithms_hybrid }}
+{% endif %}
+
+# --- Symmetric cryptography ---------------------------------------------
+
+Ciphers {{ sshd_ciphers }}
+MACs {{ sshd_macs }}
+RekeyLimit {{ sshd_rekey_limit }}
+
+# --- Authentication --------------------------------------------------------
+
+AuthenticationMethods {{ sshd_authentication_methods }}
+PubkeyAuthentication {{ sshd_pubkey_authentication | ternary('yes', 'no') }}
+
+PubkeyAcceptedAlgorithms {{ sshd_pubkey_accepted_algorithms }}
+PubkeyAuthOptions {{ sshd_pubkey_auth_options }}
+
+AuthorizedKeysFile {{ sshd_authorized_keys_file }}
+StrictModes {{ sshd_strict_modes | ternary('yes', 'no') }}
+
+AuthorizedKeysCommand {{ sshd_authorized_keys_command }}
+AuthorizedPrincipalsFile {{ sshd_authorized_principals_file }}
+{% if sshd_revoked_keys %}
+RevokedKeys {{ sshd_revoked_keys }}
+{% endif %}
+
+PasswordAuthentication {{ sshd_password_authentication | ternary('yes', 'no') }}
+PermitEmptyPasswords {{ sshd_permit_empty_passwords | ternary('yes', 'no') }}
+
+# PAM's keyboard-interactive method can reintroduce password prompts even
+# with PasswordAuthentication disabled.
+KbdInteractiveAuthentication {{ sshd_kbd_interactive_authentication | ternary('yes', 'no') }}
+
+HostbasedAuthentication {{ sshd_hostbased_authentication | ternary('yes', 'no') }}
+IgnoreRhosts {{ sshd_ignore_rhosts | ternary('yes', 'no') }}
+IgnoreUserKnownHosts {{ sshd_ignore_user_known_hosts | ternary('yes', 'no') }}
+
+GSSAPIAuthentication {{ sshd_gssapi_authentication | ternary('yes', 'no') }}
+KerberosAuthentication {{ sshd_kerberos_authentication | ternary('yes', 'no') }}
+
+PermitRootLogin {{ sshd_permit_root_login | ternary('yes', 'no') }}
+
+UsePAM {{ sshd_use_pam | ternary('yes', 'no') }}
+
+MaxAuthTries {{ sshd_max_auth_tries }}
+LoginGraceTime {{ sshd_login_grace_time }}
+
+# --- Access control ----------------------------------------------------
+
+{% if sshd_allow_groups %}
+AllowGroups {{ sshd_allow_groups | join(' ') }}
+{% endif %}
+{% if sshd_allow_users %}
+AllowUsers {{ sshd_allow_users | join(' ') }}
+{% endif %}
+{% if sshd_deny_groups %}
+DenyGroups {{ sshd_deny_groups | join(' ') }}
+{% endif %}
+{% if sshd_deny_users %}
+DenyUsers {{ sshd_deny_users | join(' ') }}
+{% endif %}
+
+# --- Rate limiting -------------------------------------------------------
+
+MaxStartups {{ sshd_max_startups }}
+PerSourcePenalties {{ sshd_per_source_penalties }}
+PerSourceMaxStartups {{ sshd_per_source_max_startups }}
+PerSourceNetBlockSize {{ sshd_per_source_net_block_size }}
+{% if sshd_per_source_penalty_exempt_list %}
+PerSourcePenaltyExemptList {{ sshd_per_source_penalty_exempt_list | join(',') }}
+{% endif %}
+
+# --- Session behaviour ---------------------------------------------------
+
+ClientAliveInterval {{ sshd_client_alive_interval }}
+ClientAliveCountMax {{ sshd_client_alive_count_max }}
+TCPKeepAlive {{ sshd_tcp_keepalive | ternary('yes', 'no') }}
+UseDNS {{ sshd_use_dns | ternary('yes', 'no') }}
+
+# --- Forwarding and features ------------------------------------------
+
+DisableForwarding {{ sshd_disable_forwarding | ternary('yes', 'no') }}
+
+# Kept explicit and NOT redundant with DisableForwarding - see role README
+# for the version caveats this covers.
+X11Forwarding {{ sshd_x11_forwarding | ternary('yes', 'no') }}
+AllowTcpForwarding {{ sshd_allow_tcp_forwarding | ternary('yes', 'no') }}
+AllowAgentForwarding {{ sshd_allow_agent_forwarding | ternary('yes', 'no') }}
+AllowStreamLocalForwarding {{ sshd_allow_stream_local_forwarding | ternary('yes', 'no') }}
+GatewayPorts {{ sshd_gateway_ports | ternary('yes', 'no') }}
+PermitTunnel {{ sshd_permit_tunnel | ternary('yes', 'no') }}
+PermitOpen {{ sshd_permit_open }}
+PermitListen {{ sshd_permit_listen }}
+
+PermitUserEnvironment {{ sshd_permit_user_environment | ternary('yes', 'no') }}
+PermitUserRC {{ sshd_permit_user_rc | ternary('yes', 'no') }}
+
+Compression {{ sshd_compression | ternary('yes', 'no') }}
+
+PrintMotd {{ sshd_print_motd | ternary('yes', 'no') }}
+PrintLastLog {{ sshd_print_last_log | ternary('yes', 'no') }}
+
+VersionAddendum {{ sshd_version_addendum }}
+Banner {{ sshd_banner }}
+
+# --- Logging -------------------------------------------------------------
+
+SyslogFacility {{ sshd_syslog_facility }}
+LogLevel {{ sshd_log_level }}
+
+{% if sshd_sftp_subsystem_enabled %}
+# --- Subsystems ------------------------------------------------------------
+
+Subsystem sftp internal-sftp -f {{ sshd_sftp_log_facility }} -l {{ sshd_sftp_log_level }}
+{% endif %}
+
+{% for block in sshd_match_blocks %}
+Match {{ block.match }}
+{% for key, value in block.options.items() %}
+    {{ key }} {{ value }}
+{% endfor %}
+{% endfor %}

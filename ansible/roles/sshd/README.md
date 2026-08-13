@@ -5,7 +5,7 @@ Installs the OpenSSH server and applies a baseline hardening of the SSH daemon.
 ## What it does
 
 | Task file         | Tag         | Description                                                                                 |
-|-------------------|-------------|---------------------------------------------------------------------------------------------|
+| ----------------- | ----------- | ------------------------------------------------------------------------------------------- |
 | `1_base.yml`      | `base`      | Installs `openssh-server` and ensures the `ssh` service is enabled and running.             |
 | `2_hardening.yml` | `hardening` | Disables password authentication, disables root login, and locks the root account password. |
 
@@ -23,7 +23,23 @@ service is restarted only when its configuration actually changes.
 
 ## Variables
 
-None. The role is intentionally opinionated; all behaviour is fixed.
+All defaults live in `defaults/main.yml` and can be overridden per group or
+host via the standard `group_vars`/`host_vars` mechanism - no changes to the
+role itself are needed.
+
+Before using this role on a host, review at least:
+
+- `sshd_port`, `sshd_address_family`, `sshd_listen_addresses` - the actual
+  listener config for the target host.
+- `sshd_pubkey_accepted_algorithms`, `sshd_pubkey_auth_options` - which key
+  types are accepted and how they're enforced. Default is the SOFT tier
+  (hardware + software keys, no enforcement beyond FIDO2 defaults); the
+  HYBRID and HARD variants are commented out directly in `defaults/main.yml`.
+- `sshd_allow_groups`, `sshd_allow_users`, `sshd_deny_groups`,
+  `sshd_deny_users` - who is actually permitted to log in.
+
+Misconfiguring any of these can lock legitimate users out or leave the host
+reachable with unintended keys.
 
 ## Usage
 

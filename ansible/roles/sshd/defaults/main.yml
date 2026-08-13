@@ -1,0 +1,155 @@
+---
+# Minimum OpenSSH version the rendered config assumes. If the installed
+# sshd is older, the deploy task below is skipped entirely and the
+# existing /etc/ssh/sshd_config is left untouched - protects an
+# already-hardened host from a role update that assumes a newer OpenSSH
+# than what's actually installed (e.g. config bumped to require 10.4
+# while the server still runs 10.2).
+sshd_min_openssh_version: "9.9"
+
+# Default values for the sshd role. Every value here can be overridden per
+# group or host via group_vars/host_vars (standard Ansible variable
+# precedence - no extra logic needed in the tasks themselves).
+#
+# These defaults reproduce the hardened baseline config (target: OpenSSH 9.9+).
+
+# --- Listener ---------------------------------------------------------------
+
+sshd_port: 22
+sshd_address_family: any
+sshd_listen_addresses:
+  - "0.0.0.0"
+  - "::"
+
+# --- Host keys ----------------------------------------------------------
+
+sshd_host_keys:
+  - /etc/ssh/ssh_host_ed25519_key
+
+sshd_host_key_algorithms: ssh-ed25519
+
+# --- Key exchange -------------------------------------------------------
+
+# false: hybrid PQ + classical fallback (compatible with older clients).
+# true:  PQ-only, drops any client that cannot do a PQ handshake.
+sshd_kex_strict_pq_only: false
+
+sshd_kex_algorithms_hybrid: "mlkem768x25519-sha256,sntrup761x25519-sha512,sntrup761x25519-sha512@openssh.com,curve25519-sha256"
+sshd_kex_algorithms_pq_only: "mlkem768x25519-sha256,sntrup761x25519-sha512,sntrup761x25519-sha512@openssh.com"
+
+# --- Symmetric cryptography ----------------------------------------------
+
+sshd_ciphers: "chacha20-poly1305@openssh.com,aes256-gcm@openssh.com"
+sshd_macs: "hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com"
+sshd_rekey_limit: "1G 1h"
+
+# --- Authentication -------------------------------------------------------
+
+sshd_authentication_methods: publickey
+sshd_pubkey_authentication: true
+
+# SOFT: hardware and software keys, no enforcement beyond FIDO2 defaults.
+sshd_pubkey_accepted_algorithms: "sk-ssh-ed25519@openssh.com,ssh-ed25519"
+sshd_pubkey_auth_options: none
+
+# HYBRID: hardware and software keys, verify+touch requested. Enforced only
+# on hardware keys - software keys silently bypass both requirements.
+#sshd_pubkey_accepted_algorithms: "sk-ssh-ed25519@openssh.com,ssh-ed25519"
+#sshd_pubkey_auth_options: verify-required touch-required
+
+# HARD: hardware keys only, verify+touch required for every login.
+#sshd_pubkey_accepted_algorithms: "sk-ssh-ed25519@openssh.com"
+#sshd_pubkey_auth_options: verify-required touch-required
+
+sshd_authorized_keys_file: /etc/ssh/authorized_keys/%u
+sshd_strict_modes: true
+sshd_authorized_keys_command: none
+sshd_authorized_principals_file: none
+
+# Path to a revocation list (ssh-keygen -kf <path> ...). Leave empty to omit
+# the RevokedKeys directive entirely.
+sshd_revoked_keys: ""
+
+sshd_password_authentication: false
+sshd_permit_empty_passwords: false
+sshd_kbd_interactive_authentication: false
+sshd_hostbased_authentication: false
+sshd_ignore_rhosts: true
+sshd_ignore_user_known_hosts: true
+sshd_gssapi_authentication: false
+sshd_kerberos_authentication: false
+sshd_permit_root_login: false
+sshd_use_pam: true
+sshd_max_auth_tries: 3
+sshd_login_grace_time: 30
+
+# --- Access control -------------------------------------------------------
+
+# Group-based allowlist. Membership is the single point of control.
+sshd_allow_groups:
+  - ssh-users
+sshd_allow_users: []
+sshd_deny_groups: []
+sshd_deny_users: []
+
+# --- Rate limiting ---------------------------------------------------------
+
+sshd_max_startups: "10:30:60"
+sshd_per_source_penalties: "noauth:2 authfail:8 grace-exceeded:20 max:600 min:30"
+sshd_per_source_max_startups: 3
+sshd_per_source_net_block_size: "32:64"
+
+# Networks exempt from PerSource penalties (e.g. the management network), so
+# a misbehaving script cannot lock you out of your own jump host.
+sshd_per_source_penalty_exempt_list: []
+
+# --- Session behaviour ------------------------------------------------------
+
+sshd_client_alive_interval: 300
+sshd_client_alive_count_max: 3
+sshd_tcp_keepalive: false
+sshd_use_dns: false
+
+# --- Forwarding and features -------------------------------------------
+
+sshd_disable_forwarding: true
+sshd_x11_forwarding: false
+sshd_allow_tcp_forwarding: false
+sshd_allow_agent_forwarding: false
+sshd_allow_stream_local_forwarding: false
+sshd_gateway_ports: false
+sshd_permit_tunnel: false
+sshd_permit_open: none
+sshd_permit_listen: none
+sshd_permit_user_environment: false
+sshd_permit_user_rc: false
+sshd_compression: false
+sshd_print_motd: false
+sshd_print_last_log: true
+sshd_version_addendum: none
+sshd_banner: none
+
+# --- Logging -----------------------------------------------------------
+
+sshd_syslog_facility: AUTH
+sshd_log_level: VERBOSE
+
+# --- Subsystems ----------------------------------------------------------
+
+sshd_sftp_subsystem_enabled: true
+sshd_sftp_log_facility: AUTH
+sshd_sftp_log_level: INFO
+
+# --- Per-group/host overrides (Match blocks) --------------------------------
+#
+# Populate via group_vars/host_vars to enable Match blocks, e.g.:
+#
+# sshd_match_blocks:
+#   - match: "Group sftp-only"
+#     options:
+#       ChrootDirectory: "/srv/sftp/%u"
+#       ForceCommand: internal-sftp
+#       PermitTTY: "no"
+#       X11Forwarding: "no"
+#       AllowTcpForwarding: "no"
+sshd_match_blocks: []

@@ -1,18 +1,38 @@
 ---
-- name: Disable SSH password authentication
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: "^PasswordAuthentication"
-    line: "PasswordAuthentication no"
-    state: present
+- name: Determine installed OpenSSH version
+  ansible.builtin.command: sshd -V
+  register: sshd_version_check
+  changed_when: false
+  failed_when: false
 
-- name: Ensure PermitRootLogin is set to no
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: "^PermitRootLogin"
-    line: "PermitRootLogin no"
-    state: present
+- name: Parse installed OpenSSH version
+  ansible.builtin.set_fact:
+    sshd_installed_version: >-
+      {{ ((sshd_version_check.stdout + sshd_version_check.stderr)
+         | regex_search('OpenSSH_([0-9]+\.[0-9]+)', '\1')
+         | default([], true))
+         | first
+         | default('0.0', true) }}
+
+- name: Warn if installed OpenSSH is older than required
+  ansible.builtin.debug:
+    msg: >-
+      WARNING: installed OpenSSH {{ sshd_installed_version }} is older than
+      sshd_min_openssh_version ({{ sshd_min_openssh_version }}) - skipping
+      sshd_config deployment. Existing /etc/ssh/sshd_config is left
+      untouched until the host's OpenSSH is upgraded.
+  when: sshd_installed_version is version(sshd_min_openssh_version, '<')
+
+- name: Deploy hardened sshd_config
+  ansible.builtin.template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: "0600"
+    validate: /usr/sbin/sshd -t -f %s
     backup: true
+  when: sshd_installed_version is version(sshd_min_openssh_version, '>=')
   notify: Restart sshd
 
 - name: Lock root account password
